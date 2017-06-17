@@ -6,12 +6,6 @@ DROP TABLE IF EXISTS Family;
 DROP TABLE IF EXISTS Store;
 DROP TABLE IF EXISTS City;
 
-CREATE TABLE City
-(
-	City varchar(255) PRIMARY KEY,
-	Population int
-);
-
 CREATE TABLE Store
 (
 	Store int PRIMARY KEY,
@@ -30,7 +24,7 @@ CREATE TABLE Factory
 	Factory int PRIMARY KEY,
 	AgeOfFactory int,
 	Capacity int,
-	FactoryLocation varchar(255) REFERENCES City(City)
+	FactoryLocation varchar(255)
 );
 
 CREATE TABLE Catalogue
@@ -43,26 +37,25 @@ CREATE TABLE Catalogue
 
 CREATE TABLE NoReturn00100
 (
-	TicketNumber int PRIMARY KEY,
+	TicketNumber int,
 	Date date,
 	IDDevice varchar(255) REFERENCES Catalogue,
 	Store int REFERENCES Store,
-	Factory int REFERENCES Factory
+	Factory int REFERENCES Factory,
+	PRIMARY KEY (TicketNumber, IDDevice, Factory)
 );
 
-\copy City FROM 'city_fr.csv' DELIMITER ';' csv;
 \copy Store FROM 'Store.csv' DELIMITER ';' csv;
 \copy Family FROM 'family.csv' DELIMITER ';' csv;
 \copy Factory FROM 'Factory.csv' DELIMITER ';' csv;
 \copy Catalogue FROM 'catalogue.csv' DELIMITER ';' csv;
-\copy NoReturn00100 FROM 'NoReturn00100_new.csv' DELIMITER ';' csv;
+\copy NoReturn00100 FROM 'NoReturn00100.csv' DELIMITER ';' csv;
 
-CREATE VIEW view_all AS
+CREATE OR REPLACE VIEW view_all AS
 SELECT * FROM NoReturn00100
 RIGHT JOIN Catalogue USING (IDDevice)
 RIGHT JOIN Store USING (Store)
 RIGHT JOIN Factory USING (Factory)
-RIGHT JOIN Family USING (SubFamily)
-RIGHT JOIN City ON Factory.FactoryLocation = City.City;
+RIGHT JOIN Family USING (SubFamily);
 
 SELECT * FROM view_all;
